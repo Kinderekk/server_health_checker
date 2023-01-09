@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import HealthCheck from './templates/HealthCheck';
+import Report from './templates/Report';
 import { Cofnig } from './types/config';
 import { Server } from './types/server';
 
@@ -9,17 +10,16 @@ const port = 4444;
 const configFile = 'config.json';
 
 fs.readFile(configFile, (err, data) => {
-  if (err) {
-    console.log(err);
-    throw err;
-  }
+  if (err) throw err;
 
   const config: Cofnig = JSON.parse(data.toString());
 
   if (config) {
+    const reportSystem = new Report(config.email);
+
     config.servers.forEach((server: Server) => {
 
-      const healthCheck = new HealthCheck(server, config.email);
+      new HealthCheck(server, reportSystem);
 
     })
   }
